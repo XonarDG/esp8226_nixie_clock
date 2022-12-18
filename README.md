@@ -29,21 +29,23 @@ Nixies are annoying. Again there are virtually no alternatives other then the ol
 Since I already had a somewhat functional prototype that didn't utilize multiplexing, this project **WILL** make use of it. While it does make the code and PCB a little more complicated, these are negligible downsides to having much more IO available. And for expandability, this is something that will matter when adding more functions.
 Therefore, **this project will use multiplexing**, although that might not be the simplest way of doing things.
 
-Another crucial feature is a **RTC** module as a accurate time source for our clock.  Its a must have because otherwise we would have to fiddle around with the Nano crystal, and that's tedious work which I wanna avoid.
+Speaking of multiplexing. We'll have to find a way to switch individual anodes on or off. At first I thought about using two Transistors, but I recently found a design that uses **TLP627 Optocouplers**. These are available in variety of packages, and the one I chose is the **TLP627-4 DIP-16**, which is basically just 4 optocouplers in a single package. A big advantage of this is that I only need a single resistor at the LED side of the optocoupler.
 
-Power source is still in the mist for me. I could just use a proprietary 12V power source, but I feel like in this modern age, I might as well make use of USB-PD with its 12V output. This is still something that I have to thing about, but for now the USB-PD option seems to be the winner.
+Another crucial feature is a **RTC** module as a accurate time source for our clock. I am going to use the **DS3132** that I already have from my previous prototype. Its a must have because otherwise we would have to fiddle around with the Nano's crystal, and that's tedious work which I wanna avoid.
 
-Even though the power source for this project isn't yet decided, I know for sure that it has to be 12V since that's the lowest voltage that my High-voltage source works at. This of course means that I have to somehow lower the voltage for the Nano since that is only really capable running on around 6V. *(Yes, you can indeed run them on 12V as well, but the voltage regulator of the Nano isn't made for those voltages, so you are practically hazarding with burning down your board.)* After a bit of searching I found a really [tiny DC/DC stepdown converter](https://www.ebay.com/itm/401605679624?) that is very much capable of supplying the Nano, while being quite efficient. An alternative to this module would be a linear converter, but those are very inefficient. Its also a tiny module so it's not taking up a lot of space on the PCB.
+Power source is an essential component. I was thinking about using USB-PD, but for the simplicity of this project, I decided to use a **12V wall adaptor** with a barrel connector.
+
+This of course means that I have to somehow lower the voltage for the Nano since that is only really capable running on around 6V. *(Yes, you can indeed run them on 12V as well, but the voltage regulator of the Nano isn't made for those voltages, so you are practically hazarding with burning down your board.)* After a bit of searching I found a really [tiny DC/DC stepdown converter](https://www.ebay.com/itm/401605679624?) that is very much capable of supplying the Nano, while being quite efficient. An alternative to this module would be a linear converter, but those are very inefficient. Thanks to its size, it won't take up loads of PCB space.
 
 First thing is getting a list of parts:
 
 | Part | Model/Type | Reason |
-|:-----|:----------:|-------:|
+|:-----|:----------|-------:|
 | Controller | Arduino Nano | accessible, easy to develop for, cheap, small, has a lot of outputs |
 | Nixie Drivers | MH74141 | accessible |
 | Nixies | ZM1020 | accessible, decently sized digits, are socketed |
-| Transistors | **todo** | for multiplexing |
-| Resistors | **find a good rating** | current protection for nixies |
+| Optocouplers | TLP-627 | convenient, simple |
+| Resistors | **todo** | current protection for nixies, optocouplers |
 | RTC module | **todo** | convenient, will make the clock easier to code and more accurate |
 | Step-Down converter for Controller | **todo** | necessary |
 | High-voltage source for nixies | **todo** | necessary |
