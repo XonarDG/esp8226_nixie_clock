@@ -45,7 +45,7 @@ First thing is getting a list of parts:
 | Nixie Drivers | MH74141 | accessible |
 | Nixies | ZM1020 | accessible, decently sized digits, are socketed |
 | Optocouplers | TLP-627 | convenient, simple |
-| Resistors | **todo** | current protection for nixies, optocouplers |
-| RTC module | **todo** | convenient, will make the clock easier to code and more accurate |
-| Step-Down converter for Controller | **todo** | necessary |
+| Resistors | **todo** | current protection for nixies, optocoupler diode ends |
+| RTC module | DS1307 Board | convenient, will make the clock easier to code and more accurate |
+| Step-Down converter for Controller | HX Mini360 | necessary, small size |
 | High-voltage source for nixies | **todo** | necessary |
