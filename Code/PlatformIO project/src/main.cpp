@@ -91,10 +91,22 @@ void WriteNumber(int number)
   }
 }
 
+void AllNumbers(int delay_length, int seconds)
+{
+
+for (size_t i = 0; i < 9; i++)
+{
+  digitalWrite(TH, HIGH);  
+  WriteNumber(i);
+  delay(delay_length);
+}
+
+}
+
 void setup() 
 {
 
-  Serial.begin(9600);
+  //Serial.begin(9600);
   rtc.begin();
 
   pinMode(TH, OUTPUT);
@@ -106,12 +118,23 @@ void setup()
   pinMode(C, OUTPUT);
   pinMode(D, OUTPUT);
 
+  digitalWrite(TH, LOW);
+  digitalWrite(H, LOW);
+  digitalWrite(TM, LOW);
+  digitalWrite(M, LOW);
+  digitalWrite(A, LOW);
+  digitalWrite(B, LOW);
+  digitalWrite(C, LOW);
+  digitalWrite(D, LOW);
+
+  //rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
+
 }
 
 void loop()
 {
 
-  Space = 1000;
+  Space = 1;
 
   DateTime time = rtc.now();
 
@@ -125,40 +148,42 @@ void loop()
   TenMinute = (time.minute() / 10) % 10;
   Minute = (time.minute() % 10);
 
+  /*Serial.print(TenHour);
+  Serial.print(Hour);
+  Serial.print(TenMinute);
+  Serial.print(Minute);
+  Serial.println();*/
+
   switch(MultiPlexCounter)
   {
     case 0:
-    WriteNumber(TenHour);
     digitalWrite(TH, HIGH);
+    WriteNumber(TenHour);
     MultiPlexCounter++;
-    Serial.print(TenHour);
     delay(Space);
+    digitalWrite(TH, LOW);
     break;
     case 1:
-    WriteNumber(Hour);
-    digitalWrite(TH, LOW);
     digitalWrite(H, HIGH);
+    WriteNumber(Hour);
     MultiPlexCounter++;
-    Serial.print(Hour);
     delay(Space);
+    digitalWrite(H, LOW);
     break;
     case 2:
-    WriteNumber(TenMinute);
-    digitalWrite(H, LOW);
     digitalWrite(TM, HIGH);
+    WriteNumber(TenMinute);
     MultiPlexCounter++;
-    Serial.print(TenMinute);
     delay(Space);
+    digitalWrite(TM, LOW);
     break;
     case 3:
-    WriteNumber(Minute);
-    digitalWrite(TM, LOW);
     digitalWrite(M, HIGH);
+    WriteNumber(Minute);
     MultiPlexCounter = 0;
-    Serial.print(Minute);
-    Serial.println();
     delay(Space);
+    digitalWrite(M, LOW);
     break;
   }
-  digitalWrite(M, LOW);
+  //AllNumbers(10, 10);
 }
