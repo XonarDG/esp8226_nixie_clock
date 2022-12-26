@@ -15,6 +15,8 @@
 #define C 7
 #define D 8
 
+#define colon 14
+
 //#define FAST 4
 //#define SLOW 3
 //#define VERYSLOW 2
@@ -22,10 +24,12 @@
 //declaring the RTC
 RTC_DS3231 rtc;
 
-int Minutes = 0;
-int MinutePlusOne = 0;
+bool AllNumbersSwitch = true;
+int MinutesPlus = 0;
 int MultiPlexCounter = 0;
 int Space = 0;
+
+bool Switch = true;
 
 void WriteNumber(int number)
 {
@@ -107,6 +111,7 @@ void setup()
   pinMode(B, OUTPUT);
   pinMode(C, OUTPUT);
   pinMode(D, OUTPUT);
+  pinMode(colon, OUTPUT);
 
   digitalWrite(TH, LOW);
   digitalWrite(H, LOW);
@@ -116,35 +121,23 @@ void setup()
   digitalWrite(B, LOW);
   digitalWrite(C, LOW);
   digitalWrite(D, LOW);
-
-  DateTime time = rtc.now();
-  Minutes = time.minute();
-  if (Minutes < 58)
-  {
-    MinutePlusOne = Minutes + 1;
-  }
-  else
-  {
-    MinutePlusOne = Minutes - 58;
-  }
-  
+  digitalWrite(colon, LOW);
 
   //rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
 
 }
-
-void AllNumbers(int delay_length, int frequency_in_minutes)
-{
+void AllNumbers(size_t number_of_repeats, size_t digit_display_time_ms, int frequency_in_minutes, int currentMinute)
+{ 
   int MultiPlexCounter = 0;
-  DateTime time = rtc.now();
-  Minutes = time.minute();
-  if (Minutes == MinutePlusOne)
+
+  /*int setfrequency = currentMinute % frequency_in_minutes;
+  if (setfrequency == 0)
   {
-    for (size_t i = 0; i < 4; i++)
+    for (size_t i = 0; i < number_of_repeats; i++)
     {
       for (size_t number = 0; number < 9; number++)
       { 
-        for (size_t i = 0; i < 50; i++)
+        for (size_t i = 0 ; i < Delay; i++)
         {
           switch(MultiPlexCounter)
           {
@@ -180,18 +173,125 @@ void AllNumbers(int delay_length, int frequency_in_minutes)
         }
       }
     }
-  }
-  if (Minutes < 58)
+  }*/  
+  
+  if (AllNumbersSwitch == true)
   {
-    MinutePlusOne = Minutes + frequency_in_minutes;
+     if (MinutesPlus < currentMinute)
+    {
+      MinutesPlus = currentMinute + frequency_in_minutes;
+    }
+    AllNumbersSwitch = false;
+  }
+
+  if (currentMinute == MinutesPlus)
+  {
+    for (size_t i = 0; i < number_of_repeats; i++)
+    {
+      for (size_t number = 0; number < 9; number++)
+      { 
+        for (size_t i = 0 ; i < (digit_display_time_ms / 4); i++)
+        {
+          switch(MultiPlexCounter)
+          {
+            case 0:
+            digitalWrite(TH, HIGH);
+            WriteNumber(number);
+            MultiPlexCounter++;
+            delay(Space);
+            digitalWrite(TH, LOW);
+            break;
+            case 1:
+            digitalWrite(H, HIGH);
+            WriteNumber(number);
+            MultiPlexCounter++;
+            delay(Space);
+            digitalWrite(H, LOW);
+            break;
+            case 2:
+            digitalWrite(TM, HIGH);
+            WriteNumber(number);
+            MultiPlexCounter++;
+            delay(Space);
+            digitalWrite(TM, LOW);
+            break;
+            case 3:
+            digitalWrite(M, HIGH);
+            WriteNumber(number);
+            MultiPlexCounter = 0;
+            delay(Space);
+            digitalWrite(M, LOW);
+            break;
+          }
+        }
+      }
+    }
+    MinutesPlus = MinutesPlus + frequency_in_minutes; 
+  }
+    if (MinutesPlus >= 60)
+  {
+    MinutesPlus = MinutesPlus - 60;
+  }
+}
+
+void Colon(int currentSecond)
+
+{
+  int second = currentSecond; 
+  if (second % 2 == 0)
+  {
+    digitalWrite(colon, HIGH);
   }
   else
-  {
-    MinutePlusOne = Minutes - 58;
-  }
-  
-  
+  digitalWrite(colon, LOW);  
 }
+
+void ShowDate(int day, int month, int year, int currentMinute, int frequency_in_minutes, size_t display_time)
+{
+
+MultiPlexCounter = 0;
+
+int TenDay = (day / 10) % 10;         
+int Day = (day % 10);
+int TenMonth = (month / 10) % 10;
+int Month = (month % 10);
+ for (size_t i = 0; i < 3600; i++)
+ {
+  switch(MultiPlexCounter)
+  {
+    case 0:
+    digitalWrite(TH, HIGH);
+    WriteNumber(TenDay);
+    MultiPlexCounter++;
+    delay(Space);
+    digitalWrite(TH, LOW);
+    break;
+    case 1:
+    digitalWrite(H, HIGH);
+    WriteNumber(Day);
+    MultiPlexCounter++;
+    delay(Space);
+    digitalWrite(H, LOW);
+    break;
+    case 2:
+    digitalWrite(TM, HIGH);
+    WriteNumber(TenMonth);
+    MultiPlexCounter++;
+    delay(Space);
+    digitalWrite(TM, LOW);
+    break;
+    case 3:
+    digitalWrite(M, HIGH);
+    WriteNumber(Month);
+    MultiPlexCounter = 0;
+    delay(Space);
+    digitalWrite(M, LOW);
+    break;
+    }
+ }
+ 
+  
+  }
 
 void loop()
 {
@@ -215,8 +315,13 @@ void loop()
   Serial.print(TenMinute);
   Serial.print(Minute);
   Serial.println();*/
-
-  AllNumbers(20, 5);
+    if (Switch == true)
+  {
+    ShowDate(time.day(), time.month(), time.year(), time.minute(), 30, 300);
+    Switch = false;
+  }
+  AllNumbers(3, 200, 7, time.minute());
+  Colon(time.second());
 
   switch(MultiPlexCounter)
   {
