@@ -231,7 +231,7 @@ void loop()
 
   DateTime time = rtc.now();
 
-  AllNumbers(3, 200, 7, time.minute());
+  AllNumbers(3, 200, 10, time.unixtime());
   Colon(time.second());
   ShowTime(time.hour(), time.minute());
 
