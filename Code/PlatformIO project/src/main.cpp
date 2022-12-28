@@ -165,11 +165,8 @@ void AllNumbers(size_t number_of_repeats, size_t digit_display_time_ms, int freq
 { 
   if (AllNumbersSwitch == true)
   {
-     if (unix_time_plus < unix_time)
-    {
       unix_time_plus = unix_time + frequency_in_seconds;
-    }
-    AllNumbersSwitch = false;
+      AllNumbersSwitch = false;
   }
 
   if (unix_time == unix_time_plus)
