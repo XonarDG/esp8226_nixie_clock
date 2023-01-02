@@ -27,7 +27,8 @@ RTC_DS3231 rtc;
 bool AllNumbersSwitch = true;
 int unix_time_plus = 0;
 int multiplex_counter = 0;
-int multiplex_timing = 0;
+const long multiplex_timing = 2;
+int i =0;
 
 void setup() 
 {
@@ -127,33 +128,32 @@ void WriteNumber(int number)
 }
 void MultiPlex(int first_number, int second_number, int third_number, int forth_number)
 {
-
   switch(multiplex_counter)
   {
     case 0:
-    digitalWrite(TH, HIGH);
     WriteNumber(first_number);
+    digitalWrite(TH, HIGH);
     multiplex_counter++;
     delay(multiplex_timing);
     digitalWrite(TH, LOW);
     break;
     case 1:
-    digitalWrite(H, HIGH);
     WriteNumber(second_number);
+    digitalWrite(H, HIGH);
     multiplex_counter++;
     delay(multiplex_timing);
     digitalWrite(H, LOW);
     break;
     case 2:
-    digitalWrite(TM, HIGH);
     WriteNumber(third_number);
+    digitalWrite(TM, HIGH);
     multiplex_counter++;
     delay(multiplex_timing);
     digitalWrite(TM, LOW);
     break;
     case 3:
-    digitalWrite(M, HIGH);
     WriteNumber(forth_number);
+    digitalWrite(M, HIGH);
     multiplex_counter = 0;
     delay(multiplex_timing);
     digitalWrite(M, LOW);
@@ -196,7 +196,8 @@ void Colon(int unix_time)
   digitalWrite(colon, LOW);  
 
 }
-void ShowDate(int day, int month, int year, int currentMinute, int frequency_in_minutes, size_t display_time)
+void ShowDate(int day, int month, int year, int unix_time)
+
 {
 
   int TenDay = (day / 10) % 10;         
@@ -204,10 +205,7 @@ void ShowDate(int day, int month, int year, int currentMinute, int frequency_in_
   int TenMonth = (month / 10) % 10;
   int Month = (month % 10);
 
-  for (size_t i = 0; i < 3600; i++)
-  {
-    MultiPlex(TenDay, Day, TenMonth, Month);
-  }
+  MultiPlex(TenDay, Day, TenMonth, Month);
 
 }
 void ShowTime(int hour, int minute)
@@ -221,15 +219,24 @@ void ShowTime(int hour, int minute)
   MultiPlex(TenHour, Hour, TenMinute, Minute);
 
 }
+bool TimeComparison(int next_unix_time, int unix_time)
+{
+  if (next_unix_time == unix_time)
+  {
+    return true;
+  }
+  return false;
+  
+}
 void loop()
 {
-
-  multiplex_timing = 1;
-
   DateTime time = rtc.now();
 
-  AllNumbers(3, 200, 10, time.unixtime());
+  //AllNumbers(3, 200, 10, time.unixtime());
   Colon(time.second());
   ShowTime(time.hour(), time.minute());
+  //ShowDate(time.day(), time.month(), time.year(), time.unixtime());
+
+  
 
 }
