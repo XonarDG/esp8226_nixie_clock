@@ -186,9 +186,8 @@ void AllNumbers(size_t number_of_repeats, size_t digit_display_time_ms, int freq
 }
 void Colon(int unix_time)
 {
-
-  int second = unix_time; 
-  if (second % 2 == 0)
+ 
+  if (unix_time % 2 == 0)
   {
     digitalWrite(colon, HIGH);
   }
@@ -233,7 +232,7 @@ void loop()
   DateTime time = rtc.now();
 
   //AllNumbers(3, 200, 10, time.unixtime());
-  Colon(time.second());
+  Colon(time.unixtime());
   ShowTime(time.hour(), time.minute());
   //ShowDate(time.day(), time.month(), time.year(), time.unixtime());
 
