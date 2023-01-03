@@ -188,11 +188,9 @@ void Colon(int unix_time)
 {
  
   if (unix_time % 2 == 0)
-  {
     digitalWrite(colon, HIGH);
-  }
   else
-  digitalWrite(colon, LOW);  
+    digitalWrite(colon, LOW);  
 
 }
 void ShowDate(int day, int month, int year, int unix_time)
