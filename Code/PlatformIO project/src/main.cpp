@@ -15,7 +15,8 @@
 #define C 7
 #define D 8
 
-#define colon 14
+#define COLON_BOTTOM 14
+#define COLON_TOP 15
 
 //#define FAST 4
 //#define SLOW 3
@@ -44,7 +45,8 @@ void setup()
   pinMode(B, OUTPUT);
   pinMode(C, OUTPUT);
   pinMode(D, OUTPUT);
-  pinMode(colon, OUTPUT);
+  pinMode(COLON_BOTTOM, OUTPUT);
+  pinMode(COLON_TOP, OUTPUT);
 
   digitalWrite(TH, LOW);
   digitalWrite(H, LOW);
@@ -54,7 +56,8 @@ void setup()
   digitalWrite(B, LOW);
   digitalWrite(C, LOW);
   digitalWrite(D, LOW);
-  digitalWrite(colon, LOW);
+  digitalWrite(COLON_BOTTOM, LOW);
+  digitalWrite(COLON_TOP, LOW);
 
   //rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
 
@@ -184,13 +187,19 @@ void AllNumbers(size_t number_of_repeats, size_t digit_display_time_ms, int freq
     unix_time_plus = unix_time_plus + frequency_in_seconds; 
   }
 }
-void Colon(int unix_time)
+void Colon(int second)
 {
- 
-  if (unix_time % 2 == 0)
-    digitalWrite(colon, HIGH);
+  
+  if (second % 2 == 0)
+  {
+    digitalWrite(COLON_BOTTOM, HIGH);
+    digitalWrite(COLON_TOP, HIGH);
+  }
   else
-    digitalWrite(colon, LOW);  
+  {
+    digitalWrite(COLON_BOTTOM, LOW);
+    digitalWrite(COLON_TOP, LOW);  
+  }
 
 }
 void ShowDate(int day, int month, int year, int unix_time)
@@ -230,7 +239,7 @@ void loop()
   DateTime time = rtc.now();
 
   //AllNumbers(3, 200, 10, time.unixtime());
-  Colon(time.unixtime());
+  Colon(time.second());
   ShowTime(time.hour(), time.minute());
   //ShowDate(time.day(), time.month(), time.year(), time.unixtime());
 
