@@ -29,7 +29,6 @@ bool AllNumbersSwitch = true;
 int unix_time_plus = 0;
 int multiplex_counter = 0;
 const long multiplex_timing = 2;
-int i =0;
 
 void setup() 
 {
@@ -172,20 +171,51 @@ void AllNumbers(size_t number_of_repeats, size_t digit_display_time_ms, int freq
       AllNumbersSwitch = false;
   }
 
-  if (unix_time == unix_time_plus)
+  if (unix_time_plus == unix_time)
   {
-    for (size_t i = 0; i < number_of_repeats; i++)
+    for (size_t i = 0; i < 40; i++)
     {
-      for (size_t number = 0; number < 9; number++)
-      { 
-        for (size_t i = 0 ; i < (digit_display_time_ms / 4); i++)
-        {
-          MultiPlex(number, number, number, number);
-        }
-      }
+      MultiPlex(0,0,0,0);
     }
-    unix_time_plus = unix_time_plus + frequency_in_seconds; 
+    for (size_t i = 0; i < 40; i++)
+    {
+      MultiPlex(1,1,1,1);
+    }
+    for (size_t i = 0; i < 40; i++)
+    {
+      MultiPlex(2,2,2,2);
+    }
+    for (size_t i = 0; i < 40; i++)
+    {
+      MultiPlex(3,3,3,3);
+    }
+    for (size_t i = 0; i < 40; i++)
+    {
+      MultiPlex(4,4,4,4);
+    }
+    for (size_t i = 0; i < 40; i++)
+    {
+      MultiPlex(5,5,5,5);
+    }
+    for (size_t i = 0; i < 40; i++)
+    {
+      MultiPlex(6,6,6,6);
+    }
+    for (size_t i = 0; i < 40; i++)
+    {
+      MultiPlex(7,7,7,7);
+    }
+    for (size_t i = 0; i < 40; i++)
+    {
+      MultiPlex(8,8,8,8);
+    }
+    for (size_t i = 0; i < 40; i++)
+    {
+      MultiPlex(9,9,9,9);
+    }
+    unix_time_plus + frequency_in_seconds;
   }
+  
 }
 void Colon(int second)
 {
@@ -224,15 +254,6 @@ void ShowTime(int hour, int minute)
 
   MultiPlex(TenHour, Hour, TenMinute, Minute);
 
-}
-bool TimeComparison(int next_unix_time, int unix_time)
-{
-  if (next_unix_time == unix_time)
-  {
-    return true;
-  }
-  return false;
-  
 }
 void loop()
 {
