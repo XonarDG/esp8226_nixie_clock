@@ -25,10 +25,16 @@
 //declaring the RTC
 RTC_DS3231 rtc;
 
-bool AllNumbersSwitch = true;
+//allnumber variables
+bool all_number_switch = true;
+int next_unix_time = 0;
+int all_number_interval = 10;
+int i = 0;
+
+//multiplex variables
 int unix_time_plus = 0;
 int multiplex_counter = 0;
-const long multiplex_timing = 2;
+const int multiplex_timing = 2;
 
 void setup() 
 {
@@ -163,59 +169,20 @@ void MultiPlex(int first_number, int second_number, int third_number, int forth_
   }
 
 }
-void AllNumbers(size_t number_of_repeats, size_t digit_display_time_ms, int frequency_in_seconds, int unix_time)
+void AllNumbers()
 { 
-  if (AllNumbersSwitch == true)
-  {
-      unix_time_plus = unix_time + frequency_in_seconds;
-      AllNumbersSwitch = false;
-  }
-
-  if (unix_time_plus == unix_time)
-  {
-    for (size_t i = 0; i < 40; i++)
-    {
-      MultiPlex(0,0,0,0);
-    }
-    for (size_t i = 0; i < 40; i++)
-    {
-      MultiPlex(1,1,1,1);
-    }
-    for (size_t i = 0; i < 40; i++)
-    {
-      MultiPlex(2,2,2,2);
-    }
-    for (size_t i = 0; i < 40; i++)
-    {
-      MultiPlex(3,3,3,3);
-    }
-    for (size_t i = 0; i < 40; i++)
-    {
-      MultiPlex(4,4,4,4);
-    }
-    for (size_t i = 0; i < 40; i++)
-    {
-      MultiPlex(5,5,5,5);
-    }
-    for (size_t i = 0; i < 40; i++)
-    {
-      MultiPlex(6,6,6,6);
-    }
-    for (size_t i = 0; i < 40; i++)
-    {
-      MultiPlex(7,7,7,7);
-    }
-    for (size_t i = 0; i < 40; i++)
-    {
-      MultiPlex(8,8,8,8);
-    }
-    for (size_t i = 0; i < 40; i++)
-    {
-      MultiPlex(9,9,9,9);
-    }
-    unix_time_plus + frequency_in_seconds;
-  }
   
+  MultiPlex(1, 1, 1, 1);
+  MultiPlex(2, 2, 2, 2);
+  MultiPlex(3, 3, 3, 3);
+  MultiPlex(4, 4, 4, 4);
+  MultiPlex(5, 5, 5, 5);
+  MultiPlex(6, 6, 6, 6);
+  MultiPlex(7, 7, 7, 7);
+  MultiPlex(8, 8, 8, 8);
+  MultiPlex(9, 9, 9, 9);
+  MultiPlex(0, 0, 0, 0);
+  i++;
 }
 void Colon(int second)
 {
@@ -255,15 +222,48 @@ void ShowTime(int hour, int minute)
   MultiPlex(TenHour, Hour, TenMinute, Minute);
 
 }
+bool IntervalCheck(int current_unix_time, int next_unix_time)
+{
+  if (next_unix_time < current_unix_time)
+  {
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
 void loop()
 {
   DateTime time = rtc.now();
 
-  //AllNumbers(3, 200, 10, time.unixtime());
+  if (all_number_switch == true)
+  {
+    next_unix_time = time.unixtime() + all_number_interval;
+    all_number_switch = false;
+  }
+  
+
+  //AllNumbers();
   Colon(time.second());
-  ShowTime(time.hour(), time.minute());
+  //ShowTime(time.hour(), time.minute());
   //ShowDate(time.day(), time.month(), time.year(), time.unixtime());
 
+  if (IntervalCheck(time.unixtime(), next_unix_time) != true)
+  {
+    ShowTime(time.hour(), time.minute());
+  }
+  else
+  {
+    if (i < 400)
+    {
+      AllNumbers();
+    }
+    else
+    {
+      next_unix_time = time.unixtime() + all_number_interval;
+    }
+  }
   
 
 }
