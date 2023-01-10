@@ -245,12 +245,13 @@ void loop()
   
 
   //AllNumbers();
-  Colon(time.second());
+  //Colon(time.second());
   //ShowTime(time.hour(), time.minute());
   //ShowDate(time.day(), time.month(), time.year(), time.unixtime());
 
   if (IntervalCheck(time.unixtime(), next_unix_time) != true)
   {
+    Colon(time.second());
     ShowTime(time.hour(), time.minute());
   }
   else
