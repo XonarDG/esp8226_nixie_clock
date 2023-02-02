@@ -61,7 +61,7 @@ void setup()
   digitalWrite(COLON_BOTTOM, LOW);
   digitalWrite(COLON_TOP, LOW);
 
-  rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
+  //rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
 
 }
 
