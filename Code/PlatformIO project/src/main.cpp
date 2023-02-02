@@ -29,6 +29,9 @@ bool AllNumbersSwitch = true;
 int unix_time_plus = 0;
 int multiplex_counter = 0;
 const long multiplex_timing = 2;
+bool test_switch = true;
+int date_interval = 0;
+int date_show_time = 0;
 
 void setup() 
 {
@@ -61,6 +64,7 @@ void setup()
   //rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
 
 }
+
 void WriteNumber(int number)
 {
 
@@ -130,26 +134,26 @@ void WriteNumber(int number)
 }
 void MultiPlex(int first_number, int second_number, int third_number, int forth_number)
 {
-  switch(multiplex_counter)
+  /*switch(multiplex_counter)
   {
     case 0:
     WriteNumber(first_number);
     digitalWrite(TH, HIGH);
-    multiplex_counter++;
+    multiplex_counter = 1;
     delay(multiplex_timing);
     digitalWrite(TH, LOW);
     break;
     case 1:
     WriteNumber(second_number);
     digitalWrite(H, HIGH);
-    multiplex_counter++;
+    multiplex_counter = 2;
     delay(multiplex_timing);
     digitalWrite(H, LOW);
     break;
     case 2:
     WriteNumber(third_number);
     digitalWrite(TM, HIGH);
-    multiplex_counter++;
+    multiplex_counter = 3;
     delay(multiplex_timing);
     digitalWrite(TM, LOW);
     break;
@@ -160,10 +164,36 @@ void MultiPlex(int first_number, int second_number, int third_number, int forth_
     delay(multiplex_timing);
     digitalWrite(M, LOW);
     break;
-  }
+
+  }*/
+  
+  WriteNumber(first_number);
+  digitalWrite(TH, HIGH);
+  delay(multiplex_timing);
+  digitalWrite(TH, LOW);
+  delay(1);
+
+  WriteNumber(second_number);
+  digitalWrite(H, HIGH);
+  delay(multiplex_timing);
+  digitalWrite(H, LOW);
+  delay(1);
+
+  WriteNumber(third_number);
+  digitalWrite(TM, HIGH);
+  delay(multiplex_timing);
+  digitalWrite(TM, LOW);
+  delay(1);
+
+  WriteNumber(forth_number);
+  digitalWrite(M, HIGH);
+  delay(multiplex_timing);
+  digitalWrite(M, LOW);
+  delay(1);
 
 }
-void AllNumbers(size_t number_of_repeats, size_t digit_display_time_ms, int frequency_in_seconds, int unix_time)
+
+void AllNumbers(size_t display_time, int frequency_in_seconds, int unix_time)
 { 
   if (AllNumbersSwitch == true)
   {
@@ -173,47 +203,47 @@ void AllNumbers(size_t number_of_repeats, size_t digit_display_time_ms, int freq
 
   if (unix_time_plus == unix_time)
   {
-    for (size_t i = 0; i < 40; i++)
+    for (size_t i = 0; i < display_time; i++)
     {
       MultiPlex(0,0,0,0);
     }
-    for (size_t i = 0; i < 40; i++)
+    for (size_t i = 0; i < display_time; i++)
     {
       MultiPlex(1,1,1,1);
     }
-    for (size_t i = 0; i < 40; i++)
+    for (size_t i = 0; i < display_time; i++)
     {
       MultiPlex(2,2,2,2);
     }
-    for (size_t i = 0; i < 40; i++)
+    for (size_t i = 0; i < display_time; i++)
     {
       MultiPlex(3,3,3,3);
     }
-    for (size_t i = 0; i < 40; i++)
+    for (size_t i = 0; i < display_time; i++)
     {
       MultiPlex(4,4,4,4);
     }
-    for (size_t i = 0; i < 40; i++)
+    for (size_t i = 0; i < display_time; i++)
     {
       MultiPlex(5,5,5,5);
     }
-    for (size_t i = 0; i < 40; i++)
+    for (size_t i = 0; i < display_time; i++)
     {
       MultiPlex(6,6,6,6);
     }
-    for (size_t i = 0; i < 40; i++)
+    for (size_t i = 0; i < display_time; i++)
     {
       MultiPlex(7,7,7,7);
     }
-    for (size_t i = 0; i < 40; i++)
+    for (size_t i = 0; i < display_time; i++)
     {
       MultiPlex(8,8,8,8);
     }
-    for (size_t i = 0; i < 40; i++)
+    for (size_t i = 0; i < display_time; i++)
     {
       MultiPlex(9,9,9,9);
     }
-    unix_time_plus + frequency_in_seconds;
+    unix_time_plus = unix_time_plus + frequency_in_seconds;
   }
   
 }
@@ -232,7 +262,7 @@ void Colon(int second)
   }
 
 }
-void ShowDate(int day, int month, int year, int unix_time)
+void ShowDate(int day, int month)
 
 {
 
@@ -241,6 +271,7 @@ void ShowDate(int day, int month, int year, int unix_time)
   int TenMonth = (month / 10) % 10;
   int Month = (month % 10);
 
+  digitalWrite(COLON_BOTTOM, HIGH); 
   MultiPlex(TenDay, Day, TenMonth, Month);
 
 }
@@ -255,15 +286,43 @@ void ShowTime(int hour, int minute)
   MultiPlex(TenHour, Hour, TenMinute, Minute);
 
 }
+void ShowTimeS(int minute, int second)
+{
+
+  int TenHour = (minute / 10) % 10;         
+  int Hour = (minute % 10);
+  int TenMinute = (second / 10) % 10;
+  int Minute = (second  % 10);
+
+  MultiPlex(TenHour, Hour, TenMinute, Minute);
+
+}
+
 void loop()
 {
   DateTime time = rtc.now();
 
-  //AllNumbers(3, 200, 10, time.unixtime());
-  Colon(time.second());
-  ShowTime(time.hour(), time.minute());
-  //ShowDate(time.day(), time.month(), time.year(), time.unixtime());
+  int current_unixtime = time.unixtime();
 
+  if (test_switch == true)
+  {
+    date_interval = current_unixtime + 5;
+    date_show_time = current_unixtime + 5;
+    test_switch = false;
+  }
+
+  AllNumbers(15, 200, time.unixtime());
+  Colon(time.second());
+
+  if (time.second() >= 55)
+  {
+    ShowTime(time.minute(), time.second());
+  }
+  else
+  {
+    ShowTime(time.hour(), time.minute());
+  }
   
+  //ShowDate(time.day(), time.month());
 
 }
