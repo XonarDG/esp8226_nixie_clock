@@ -23,7 +23,7 @@
 //#define VERYSLOW 2
 
 //declaring the RTC
-RTC_DS3231 rtc;
+RTC_DS1307 rtc;
 
 bool AllNumbersSwitch = true;
 int unix_time_plus = 0;
@@ -61,7 +61,7 @@ void setup()
   digitalWrite(COLON_BOTTOM, LOW);
   digitalWrite(COLON_TOP, LOW);
 
-  //rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
+  rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
 
 }
 
