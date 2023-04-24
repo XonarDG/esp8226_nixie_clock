@@ -19,3 +19,25 @@ The first one `gmtoffset_sec` is a variable that sets your timezone in seconds.
 `ntpserver` simply sets the NTP server to use. I recommend using `pool.ntp.org`.
 
 Lines 40 to x are variables that are due to change.
+
+## setup
+* `Wire.begin(SDA,SCL);` is defining custom I2C pins for the RTC.
+* `rtc.begin();` begins communication with the RTC (this needs to be patched).
+* `Serial.begin(9600);` starts serial (development usage).
+* `rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));` is a command that sets the RTC's time to the time of code compilation (development usage)
+
+Another part of the code is pinMode `definition` and `digitalWrite` to set all the pins LOW at start.
+
+## WriteNumber
+WriteNumber is a method containing a switch with all the possible 74141 BCD outputs. This method can be used if you mess up the BCD connections to the 74141.
+
+##MultiPlex
+Multiplex is a method used to multiplex the numbers its given. The sequence has to be:
+1. `WriteNumber(number);` sets the 74141 BCD pins to the given number
+2. `digitalWrite(TLP627_pin, HIGH);` sets the exact TLP-627 optocoupler to give the given nixie its anode
+3. `delay(multiplex_timing);` waits for a bit _(this will be changed to use `millis()` instead)_
+4. `digitalWrite(TLP627_pin, LOW);` sets the exact TLP-627 optocoupler to remove the given nixie its anode
+5. `delay(1);` waits for 1ms _(this will be changed to use `millis()` instead)_
+
+
+If the sequence is different you can experience ghosting or other anomalies.
