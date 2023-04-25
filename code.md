@@ -29,15 +29,41 @@ Lines 40 to x are variables that are due to change.
 Another part of the code is pinMode `definition` and `digitalWrite` to set all the pins LOW at start.
 
 ## WriteNumber
-WriteNumber is a method containing a switch with all the possible 74141 BCD outputs. This method can be used if you mess up the BCD connections to the 74141.
+WriteNumber is a method containing a switch with all the possible 74141 BCD outputs. This method can be used as a correction if you mess up the BCD connections to the 74141. _(altough I would recommend changing the BCD output pins instead)_
 
-##MultiPlex
-Multiplex is a method used to multiplex the numbers its given. The sequence has to be:
+## MultiPlex
+The MultiPlex method is resposible to correctly multiplex nnumers its given. The exact sequence goes like:
 1. `WriteNumber(number);` sets the 74141 BCD pins to the given number
 2. `digitalWrite(TLP627_pin, HIGH);` sets the exact TLP-627 optocoupler to give the given nixie its anode
 3. `delay(multiplex_timing);` waits for a bit _(this will be changed to use `millis()` instead)_
 4. `digitalWrite(TLP627_pin, LOW);` sets the exact TLP-627 optocoupler to remove the given nixie its anode
 5. `delay(1);` waits for 1ms _(this will be changed to use `millis()` instead)_
 
+Since I use a common kathode setup the multiplexing sequence is simple.
+1. We set the number we want to show on the nixie
+2. We set the corresponding anode HIGH, thus turning on the said nixie.
+3. We wait for a set period of time. This needs to exists because microcontrollers are so fast that the TLL can't keep up.
+4. We set the correspoding anode LOW, thus turning off the said nixie.
+5. We wait for a set period of time. Again this has to exist because microcontrollers are so fast that the TLL can't keep up.
 
-If the sequence is different you can experience ghosting or other anomalies.
+The anode switching is handled by a TLP-627 optocoupler, but the same could be achieved using a couple of transistors.
+
+## Colon
+The Colon method makes our two colon LED's blink in second intervals. Since I wanted this to be as authentic as possible I decided to use the unix time output of our RTC instead of using TimeLib or other means. This method will likely be rewritten as to allow more control over the colon LED's individually.
+
+## ShowDate
+ShowDate method is an experimental method that shows the date. Right now I have no plans implementing it, however I might add a button or something to make our clock show the date on command.
+
+## ShowTime
+ShowTime is the method the clock uses to show Time. This method was taken from GreatScotts nixie tube clock. Since we have to devide the RTC time output into seperate numbers, there's some fancy maths taking place. The way I understand it, its using the Modulo function, along with some deviding, to get to separate numbers.
+
+## GetNTPTime
+The GetNTPTime method is a method that connects to WiFi waits for connection, then sends the config to the `configTime()` command which afterwards uses thes info to connect to the selected NTP server.
+
+## WriteRTC
+Is a method that uses the `time.h` library's NTP function to get the NTP time and adjust the RTC's time. This is done by providing the `getLocalTime()` by a `tm` struct. Then the method waits until it succssesfuly acquired the time from the NTP server.
+
+Both of the aforementioned methods have to be rewritten to prevent the code halting in case one of these acts fails.
+
+## UpdateRTC
+UpdateRTC combines GetNTPTime and WriteRTC in the correct order while making sure they are ran only every update inteval.
