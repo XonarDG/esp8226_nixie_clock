@@ -41,6 +41,7 @@ const char* ntpserver = "0.cz.pool.ntp.org";
 const long multiplex_timing = 2;
 bool doonceswitch = true;
 int wantedunixtime = 0;
+bool syncerrorswitch = true;
 
 void setup() 
 {
@@ -201,18 +202,33 @@ void MultiPlex(int first_number, int second_number, int third_number, int forth_
   delay(1);
 
 }
-void Colon(int second)
+void Colon(int second, bool syncerror)
 {
-  
-  if (second % 2 == 0)
+  if (syncerror != true)
   {
-    digitalWrite(COLON_BOTTOM, HIGH);
-    digitalWrite(LED_BUILTIN, HIGH);
+    if (second % 2 == 0)
+    {
+      digitalWrite(COLON_BOTTOM, HIGH);
+      digitalWrite(LED_BUILTIN, HIGH);
+    }
+    else
+    {
+      digitalWrite(COLON_BOTTOM, LOW);
+      digitalWrite(LED_BUILTIN, HIGH);  
+    }  
   }
   else
   {
-    digitalWrite(COLON_BOTTOM, LOW);
-    digitalWrite(LED_BUILTIN, LOW);  
+    if (second % 2 == 0)
+    {
+      digitalWrite(COLON_BOTTOM, HIGH);
+      digitalWrite(LED_BUILTIN, HIGH);
+    }
+  else
+    {
+      digitalWrite(COLON_BOTTOM, LOW);
+      digitalWrite(LED_BUILTIN, LOW);  
+    }    
   }
 
 }
@@ -242,37 +258,40 @@ void ShowTime(int hour, int minute)
 
 }
 
-void GetNTPTime()
+bool SyncWithNTP()
 {
+  int y = 0;
   DateTime rtctime = rtc.now();
   WiFi.begin(SECRET_SSID, SECRET_PASS);
-  while (WiFi.status() != WL_CONNECTED)
-  {
-  }
-  configTime(gmtoffset_sec, daylightoffset_sec, ntpserver);
+  if(WiFi.status() != WL_CONNECTED)
+    if(y <1000; y++)
+    {
+      if (y>200)
+      {
+        return false;
+      }
+      delay(500);
+    }        
+    configTime(gmtoffset_sec, daylightoffset_sec, ntpserver);
+    struct tm timeinfo;
+      if( !getLocalTime(&timeinfo) ) 
+        {
+        }
+      rtc.adjust(DateTime(timeinfo.tm_year +1900, timeinfo.tm_mon +1, timeinfo.tm_mday, timeinfo.tm_hour, timeinfo.tm_min, timeinfo.tm_sec));
+      WiFi.disconnect();
+      return true;    
 }
-void WriteRTC() {
-   struct tm timeinfo;
-   if( !getLocalTime(&timeinfo) ) {
-     return;
-   }
-   rtc.adjust(DateTime(timeinfo.tm_year +1900, timeinfo.tm_mon +1, timeinfo.tm_mday, timeinfo.tm_hour, timeinfo.tm_min, timeinfo.tm_sec));
-   WiFi.disconnect();
-}
-
-void UpdateRTC(int unixtime, int updateinterval_sec)
+bool UpdateRTC(int unixtime, int updateinterval_sec)
 {
   if (doonceswitch == true)
   {
-    GetNTPTime();
-    WriteRTC();
+    SyncWithNTP();
     wantedunixtime = unixtime + updateinterval_sec;
   }
 
   if (unixtime == wantedunixtime)
   {
-    GetNTPTime();
-    WriteRTC();
+    SyncWithNTP();
     wantedunixtime = unixtime + updateinterval_sec;
   }
 }
@@ -283,10 +302,13 @@ void loop()
 
   if (doonceswitch == true)
   {
-    UpdateRTC(rtctime.unixtime(), 6);
+    if (UpdateRTC(rtctime.unixtime(), 2) != true)
+    {
+      syncerrorswitch = true;
+    }
     doonceswitch = false;
   }
-  Colon(rtctime.unixtime());
+  Colon(rtctime.unixtime(), syncerrorswitch);
 
   if (rtctime.second() >= 55)
   {
@@ -296,5 +318,8 @@ void loop()
   {
     ShowTime(rtctime.hour(), rtctime.minute());
   }
-  UpdateRTC(rtctime.unixtime(), 21600);
+  if (UpdateRTC(rtctime.unixtime(), 30) != true)
+  {
+    syncerrorswitch = true;
+  }
 }
