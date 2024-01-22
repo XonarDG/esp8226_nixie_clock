@@ -31,17 +31,23 @@ uint8_t shift_reg3;
 
 uint8_t shift_reg_null;
 
+bool wifi_failure = false;
+
 void WiFiBegin()
 {
   int counter = 0;
-  WiFi.begin(SSID, PASS);
-  while ( WiFi.status() != WL_CONNECTED ) {
-    delay (500);
-    counter++;
-    if (counter > 3)
+  if (counter <= 3)
+  {
+    WiFi.begin(SSID, PASS);
+    while ( WiFi.status() != WL_CONNECTED ) 
     {
-      return;
+      delay (2000);
+      counter++;
     }
+  }
+  else
+  {
+    wifi_failure = true;
   }
   NTPC.begin();
 }
@@ -97,7 +103,10 @@ void setup()
 
 void loop()
 {
-  NTPC.update();
+  if (wifi_failure != true || WiFi.status() == WL_CONNECTED)
+  {
+    NTPC.update();
+  }
   int hh = (NTPC.getHours() / 10) % 10;         
   int h = (NTPC.getHours() % 10);
   int mm = (NTPC.getMinutes() / 10) % 10;
