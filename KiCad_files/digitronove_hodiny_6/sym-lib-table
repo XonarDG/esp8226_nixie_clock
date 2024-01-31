@@ -1,0 +1,4 @@
+(sym_lib_table
+  (version 7)
+  (lib (name "knihovna_digitrony")(type "KiCad")(uri "${KIPRJMOD}/knihovna_digitrony.kicad_sym")(options "")(descr ""))
+)
