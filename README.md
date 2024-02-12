@@ -1,33 +1,43 @@
-# simple_nixie_clock
+# esp8266_nixie_clock
 
-Simple Nixie Clock with Arduino Nano
+Simple Nixie Clock with an ESP8266 board
 
-## Goal
+## Info
 
-The goal of this project is to make a simple, reproducible, versatile, expandable and easy to understand Nixie Tube clock using as little parts possible.
+This project has been ongoing ever since late 2021, that's because I decided to ditch the ESP32 and replace it with an ESP8266. And there's more. I also got rid of the old 74141 and replaced it with a 74HC595.
+Long story short, I felt that the traditional way of multiplexing was working well enough, and I wanted to get my hands on something new, something I've not done before. I didn't upload any of my ongoing progress so far since it was more or less just a try and fail method, but now that I've got a working prototype up and running I felt it was a good time putting it out there.
 
-## Current state of the project
+## Why?
 
-Its been quite a while since I worked on this project. During this time I was able to learn quite alot about multiplexing and just electronics in general which allomed me to see deeper into the problem.
-The prototype currently on hand works as follows.
+The original project used the traditional 74141 BCD to Parallel IC in combination with TLP627 optocouplers. This method is completely viable as long as you don't mind buying IC's of ebay or wherever, but one of my project's goals was making it easy to put together, and I just felt this violated that goal. *(and I wanted a challenge)*
 
-I decided to ditch the Arduino Nano method and just went for a ESP-32 based prototype. Right now the ESP-32 is quite overkill, but it allowed me to experiment with the multiplexing method using a MH74141 and a TLP627. TLDR the multiplexing works by using the MH74141 as a decimal decoder, used for the nixie's kathodes, and the TLP627 (a optocoupler transistor package), to switch between the nixie's anodes.
-This method is effecient when it comes to the ammout of IC's used, but it comes with drawbacks.
+So the new project is using 74HC595 shift registers as a replacement for the 74141 IC's. Yes, there are other ways of doing this but let me explain.
 
-The first problem is that the ESP-32 itself has to do all the multiplexing, thus when you want to perform other functions, the multiplexing stops. As far as I am concerned there really isn't any other **simple** way to multiplex nixies. 
+Another reason why I changed the fundamentals of this project are that I didn't want to use obsolete IC's or parts. Obviously nixie tubes are obsolete but there's nothing I can do about those. I have to admit that at this point this project isn't fully devoid of any of these problems*(coughs in HV power supply)*.
 
-The other way of driving nixies is through full-duplexing. The idea is that you use a 10bit Serial-in Paralell-Out Shift Register for each nixie daisychained one to another, and using an adjectant transistor array package for the high voltage switching side for the kathodes. I find this method a bit messy compared to the multiplexing but it has its great advantages. The first one is the amount of IO used. As of now I use 8 IO for the multiplexing alone, but full-duplexing would only require 3 thanks to the possibility of chaining shift registers. Another advantage is that a shift register can hold its state. This means that the microcontroller doesn't have to constantly update the display.
+## Parts
 
+### 74HC595
 
-First thing is getting a list of parts:
+This is one of the most accessible shift registers out there and it comes with all the feature that you would ever need for just multiplexing a couple of nixie cathodes.
+It does come with its drawbacks though.
 
-| Part | Model/Type | Reason |
-|:-----|:----------|-------:|
-| Controller | Arduino Nano | accessible, easy to develop for, cheap, small, has a lot of outputs |
-| Nixie Drivers | MH74141 | accessible |
-| Nixies | ZM1020 | accessible, decently sized digits, are socketed |
-| Optocouplers | TLP-627 | convenient, simple |
-| Resistors | **todo** | current protection for nixies, optocoupler diode ends |
-| RTC module | DS1307 Board | convenient, will make the clock easier to code and more accurate |
-| Step-Down converter for Controller | HX Mini360 | necessary, small size |
-| High-voltage source for nixies | **todo** | necessary |
+The most apparent problem is that the 74HC595 only has **8 bits**, in other words 8 IO. Because of this you can't just use one IC to drive **10 cathodes**. One way of going around this is just borrowing two GPIO pins on the MCU, but you would bring along some timing problems, so the only other way is to use more than one IC.
+
+Another problem that arises it that the built-in transistors of the 74HC595 cannot handle **voltages above 7v**. Yes, there are IC's capable of high voltage drive, but as far as I am aware, none of these are as cheap or accessible. This means that we have to somehow bypass the internal transistors and use external drivers.
+
+### MPSA42
+
+Speaking of external drivers, this is the one! Again, there are many other options out there that will do the job. You can get an high voltage darlington-array IC like the ULN2003, or just a high voltage shift register e.g. TPIC6B595. I decided some good old discrete parts won't do any bad. They are relatively cheap and are readily available. You also don't have to deal with the IC's low clamp voltage.
+
+### TLP627
+
+The only part that ended up the same in this project is the high voltage optocoupler TLP627. As far as I am concerned it does everything just right. There were some concerns about leakage current of the swithing part of the IC, but after testing it with my IN-12 nixies, I can confirm that ghosting was barely visible. Keep in mind that my prototype is on a breadboard, so I expect that a PCB will be way better when it comes to current leakage and a GND connection (which seems like a real problem for my prototype).
+
+### Dicrete parts
+
+There are only a couple of discrete components used, but I'll try my best to explain why are they there.
+
+## Resistors
+
+Exclusively used as a way of limiting current.
