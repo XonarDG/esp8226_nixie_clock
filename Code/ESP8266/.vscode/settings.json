@@ -1,4 +1,10 @@
 {
     "cmake.configureOnOpen": true,
-    "cmake.sourceDirectory": "C:/Users/vojti/Documents/GitHub/simple_nixie_clock/Code/ESP8266/.pio/libdeps/d1_mini_lite/Adafruit BusIO"
+    "cmake.sourceDirectory": "C:/Users/vojti/Documents/GitHub/simple_nixie_clock/Code/ESP8266/.pio/libdeps/d1_mini_lite/Adafruit BusIO",
+    "cSpell.words": [
+        "daylightoffset",
+        "MSBFIRST",
+        "ntpserver",
+        "pinmodes"
+    ]
 }

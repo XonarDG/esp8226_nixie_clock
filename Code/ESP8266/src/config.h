@@ -1,5 +1,5 @@
-#define SSID "ssid"
-#define PASS "pass"
+#define SSID "Granik"
+#define PASS "dmmq9361"
 
 static long gmtoffset_sec = 3600;                       //timezone info
 static int daylightoffset_sec = 3600;                   //summer winter time setting
@@ -12,5 +12,4 @@ int ntp_update_interval_sec = 43200;
 int ntp_update_interval_failed = 240;
 u_int ntp_update_next;
 
-int date_interval_sec;
-
+int colon_counter = 0;
